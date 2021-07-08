@@ -14,25 +14,23 @@ module pipe_reg # (
    input                    rst_n
 );
 
-   logic [STAGE - 1 : 0][WIDTH - 1 : 0] pipe;
+   logic [STAGE : 0][WIDTH - 1 : 0] pipe;
    assign pipe[0] = in;
    assign out = pipe[STAGE];
-   genvar i;
+   integer i;
 
-   generate
          always_ff @ (posedge clk or negedge rst_n) begin
             if (rst_n == 0) begin
-               for (i = 1; i < STAGE; i = i + 1) begin
+               for (i = 1; i < STAGE + 1; i = i + 1) begin
                   pipe [i]  <= 0;
                end
             end
             else begin
-               for (i = 1; i < STAGE; i = i + 1) begin
+               for (i = 1; i < STAGE + 1; i = i + 1) begin
                   pipe [i]  <= pipe [i-1];
                end
             end
          end
-   endgenerate
 
 
 endmodule

@@ -32,11 +32,11 @@ module fix_shift #(
    
    assign in_sign = in;
    always_comb begin
-      if (in_sign[IN_WIDTH - 1 : 0] == 1) begin
-         in_ext[INTER_WIDTH - 1 : IN_WIDTH - 1 : 0] = '1;
+      if (in_sign[IN_WIDTH - 1] == 1) begin
+         in_ext[INTER_WIDTH - 1 : IN_WIDTH - 1] = '1;
       end
       else begin
-         in_ext[INTER_WIDTH - 1 : IN_WIDTH - 1 : 0] = 0;
+         in_ext[INTER_WIDTH - 1 : IN_WIDTH - 1] = 0;
       end
    end
    
@@ -46,7 +46,7 @@ module fix_shift #(
       if (SHIFT_MODE == 1) out_pre = in_ext >>> SHIFT_CONST;
       else if (SHIFT_MODE == 2) out_pre = in_ext >>> shift_amount;
       else if (SHIFT_MODE == 3) out_pre = in_ext <<< SHIFT_CONST;
-      else (SHIFT_MODE == 4) out_pre = in_ext <<< shift_amount;
+      else if (SHIFT_MODE == 4) out_pre = in_ext <<< shift_amount;
    end 
    
    generate if (SHIFT_PIPE > 0) begin

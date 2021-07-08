@@ -59,7 +59,7 @@ module fix_c_add_sub #(
       .arith_mode(arith_mode_R),
       .flip(flip),
       .shift_amount(shift_amount),
-      .out(out_R)
+      .out(out_R),
       .*
    );
 
@@ -80,7 +80,7 @@ module fix_c_add_sub #(
       .arith_mode(arith_mode_I),
       .flip(flip),
       .shift_amount(shift_amount),
-      .out(out_I)
+      .out(out_I),
       .*
    );
    

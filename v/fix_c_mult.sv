@@ -25,6 +25,7 @@ module fix_c_mult #(
 (
    input   [IN_WIDTH - 1 : 0]  opa_R,
    input   [IN_WIDTH - 1 : 0]  opa_I,
+   input   [IN_WIDTH - 1 : 0]  opb_R,
    input   [IN_WIDTH - 1 : 0]  opb_I,
    // only useful if ARITH_MODE == 2
    input                       arith_mode_R,
@@ -33,12 +34,23 @@ module fix_c_mult #(
    input                       flip,
    input   [$clog2(2*IN_WIDTH + 1) - 1 : 0] shift_amount,
    output  logic [OUT_WIDTH - 1 : 0]  out_R,
-   output  logic [OUT_WIDTH - 1 : 0]  out_I
+   output  logic [OUT_WIDTH - 1 : 0]  out_I,
+   input                           clk,
+   input                           rst_n
 );
 
    logic signed [IN_WIDTH - 1 : 0] opa_R_sign, opa_I_sign, opb_R_sign, opb_I_sign;
 
    logic signed [2*IN_WIDTH - 1 : 0] aRbR, aRbI, aIbR, aIbI;
+
+   logic [$clog2(2*IN_WIDTH) - 1 : 0] shift_zero;
+
+   assign shift_zero = 0;
+
+   assign opa_R_sign = opa_R;
+   assign opa_I_sign = opa_I;
+   assign opb_R_sign = opb_R;
+   assign opb_I_sign = opb_I;
 
    fix_mult #(
       .IN_WIDTH(IN_WIDTH),
@@ -51,7 +63,7 @@ module fix_c_mult #(
    ) mult_arbr (
       .opa(opa_R_sign),
       .opb(opb_R_sign),
-      .shift_amount(0),
+      .shift_amount(shift_zero),
       .out(aRbR),
       .*
    );
@@ -67,7 +79,7 @@ module fix_c_mult #(
    ) mult_arbi (
       .opa(opa_R_sign),
       .opb(opb_I_sign),
-      .shift_amount(0),
+      .shift_amount(shift_zero),
       .out(aRbI),
       .*
    );
@@ -83,7 +95,7 @@ module fix_c_mult #(
    ) mult_aibr (
       .opa(opa_I_sign),
       .opb(opb_R_sign),
-      .shift_amount(0),
+      .shift_amount(shift_zero),
       .out(aIbR),
       .*
    );
@@ -99,7 +111,7 @@ module fix_c_mult #(
    ) mult_aibi (
       .opa(opa_I_sign),
       .opb(opb_I_sign),
-      .shift_amount(0),
+      .shift_amount(shift_zero),
       .out(aIbI),
       .*
    );
@@ -108,7 +120,7 @@ module fix_c_mult #(
       .IN_WIDTH(2*IN_WIDTH),
       .OUT_WIDTH(OUT_WIDTH),
       .ARITH_MODE_R(ARITH_MODE_R),
-      .ARITH_MODE_R(ARITH_MODE_I),
+      .ARITH_MODE_I(ARITH_MODE_I),
       .FLIP(FLIP),
       .SHIFT_CONST(SHIFT_CONST),
       .SHIFT_MODE(SHIFT_MODE),
