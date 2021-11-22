@@ -11,10 +11,18 @@
       0 : no flip
       1 : flip
       2 : determined by flip pin
+
+
+   SHIFT_MODE = 0 -> no shifting
+   SHIFT_MODE > 0 -> follows fix_shift convention
  
    SAT_PIPE: different stage of pipelined register inserted after sat
    SHIFT_PIPE: different stage of pipelined register inserted after sat
    ADD_PIPE: different stage of pipelined register inserted after add / sub itself
+
+   Revisions:
+      10/11/21:
+        First Documentation
 */
 
 module fix_add_sub #(
@@ -33,6 +41,7 @@ module fix_add_sub #(
    input   [IN_WIDTH - 1 : 0]  opb,
    // only useful if ARITH_MODE == 2
    input                       arith_mode,
+   // only useful if FLIP == 2
    input                       flip,
    input   [$clog2(IN_WIDTH + 1) - 1 : 0] shift_amount,
    output  logic [OUT_WIDTH - 1 : 0]  out,
@@ -40,6 +49,9 @@ module fix_add_sub #(
    input                       rst_n
 );
 
+/*
+   Handles signed logic / flipping all at once
+*/
    logic signed [IN_WIDTH - 1 : 0]  opa_sign, opb_sign;
 
    generate if (FLIP == 0) begin

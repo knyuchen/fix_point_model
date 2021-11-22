@@ -1,6 +1,8 @@
 /*
    fix point mult
 
+   mult --> shift --> sat
+
    SHIFT_MODE = 0: no shift
    SHIFT_MODE = 1: shift by parameter SHIFT_CONST
    SHIFT_MODE = 2: shift by input shift_amount
@@ -8,6 +10,11 @@
    SAT_PIPE: different stage of pipelined register inserted after sat
    SHIFT_PIPE: different stage of pipelined register inserted after shift
    MULT_PIPE: different stage of pipelined register inserted after mult itself
+
+
+   Revisions:
+     10/11/21:
+       First Domumentation
 */
 module fix_mult #(
    parameter IN_WIDTH = 16,

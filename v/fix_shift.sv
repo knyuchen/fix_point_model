@@ -7,6 +7,9 @@
    SHIFT_MODE = 4: shift left by input shift_amount
 
    SHIFT_PIPE: different stage of pipelined register inserted after shift
+
+   Revisions:
+      10/11/21: First Documentation
 */
 module fix_shift #(
    parameter IN_WIDTH = 16,
@@ -23,14 +26,22 @@ module fix_shift #(
    input                              clk,
    input                              rst_n
 );
-
+/*
+   INTER_WIDTH won't change if shifted right
+*/
    parameter INTER_WIDTH = (SHIFT_MODE < 3)  ? IN_WIDTH :
                            (SHIFT_MODE == 3) ? IN_WIDTH + SHIFT_CONST:
                                                2*IN_WIDTH;
+/*
+   taking the sign, make sure it's signed
+*/
    logic signed [IN_WIDTH - 1 : 0]    in_sign;
    logic signed [INTER_WIDTH - 1 : 0] in_ext, out_pre, out_for_sat;  
    
    assign in_sign = in;
+/*
+   Sign extension, completely legal because INTER_WIDTH >= IN_WIDTH
+*/
    always_comb begin
       if (in_sign[IN_WIDTH - 1] == 1) begin
          in_ext[INTER_WIDTH - 1 : IN_WIDTH - 1] = '1;
@@ -41,7 +52,9 @@ module fix_shift #(
    end
    
    assign in_ext[IN_WIDTH - 2 : 0] = in_sign[IN_WIDTH - 2 : 0];
-
+/*
+   Actual Shifting
+*/
    always_comb begin
       if (SHIFT_MODE == 1) out_pre = in_ext >>> SHIFT_CONST;
       else if (SHIFT_MODE == 2) out_pre = in_ext >>> shift_amount;
@@ -66,7 +79,9 @@ module fix_shift #(
       assign out_for_sat = out_pre;
  
    end endgenerate 
-
+/*
+   Check Saturation if OUT_WIDTH != INTER_WIDTH
+*/
    generate if (OUT_WIDTH == INTER_WIDTH) begin
       assign out = out_for_sat;
    end

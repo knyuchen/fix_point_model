@@ -2,6 +2,12 @@
    fix point saturator
 
    SAT_PIPE: different stage of pipelined register inserted after sat
+
+   Always assume IN_WIDTH != OUT_WIDTH
+
+   Revisions:
+      10/11/21: First Documentation, fixed OUT_WIDTH > IN_WIDTH case
+ 
 */
 
 module fix_sat #(
@@ -24,10 +30,18 @@ module fix_sat #(
    
    logic over_flow;
 
-   logic [IN_WIDTH - OUT_WIDTH - 1 : 0]  determinant;
-
+/*
+   Downsizing OUT_WIDTH < IN_WIDTH
+*/
    generate if (OUT_WIDTH < IN_WIDTH) begin
+      logic [IN_WIDTH - OUT_WIDTH - 1 : 0]  determinant;
 
+/*
+   Additional Part
+   if determinant = '1, no overflow & negative
+                  = '0, no overflow & positive
+                      , overflow when saturating
+*/
 
       assign determinant = in[IN_WIDTH - 1 : OUT_WIDTH - 1];
    
@@ -35,7 +49,13 @@ module fix_sat #(
 
 
       always_comb begin
+/*
+   No overflow, keep it the same
+*/
          if (over_flow == 0) out_pre = in [OUT_WIDTH - 1 : 0];
+/*
+   Overflow, clipping
+*/
          else begin
             if (sign == 1) begin
                out_pre[OUT_WIDTH - 1] = 1;
@@ -51,8 +71,7 @@ module fix_sat #(
 
    end
    else begin
-      
-      assign out_pre [OUT_WIDTH - 1 : IN_WIDTH] = in [IN_WIDTH - 1];
+      assign out_pre [OUT_WIDTH - 1 : IN_WIDTH] = (in [IN_WIDTH - 1] == 1) ? '1 : 0;
       assign out_pre [IN_WIDTH - 1 : 0] = in;
 
    end endgenerate

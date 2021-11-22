@@ -1,12 +1,19 @@
 /*
    fix point complex number mult
 
-   ARITH_MODE = 0: opa * opb
-   ARITH_MODE = 1: opa * opb'
-   ARITH_MODE = 2:
-       arith_mode = 0 : opa * opb
-       arith_mode = 1 : opa * opb'
+   mult --> add --> shift --> sat
+ 
+   (a+bi)*(c+di) = A*B
    
+   A *B  = (ac-bd) + (ad+bc)i  --> ARITH_MODE_R = 1, ARITH_MODE_I = 0
+   A'*B  = (ac+bd) + (ad-bc)i  --> ARITH_MODE_R = 0, ARITH_MODE_I = 1
+   A *B' = (ac+bd) + (-ad+bc)i --> ARITH_MODE_R = 0, ARITH_MODE_I = 1, FLIP = 1
+   A'*B' = (ac-bd) + (-ad-bc)i --> ARITH_MODE_R = 1, ARITH_MODE_I = 0, need external neg   
+      
+ 
+   Revisions:
+     10/11/21:
+       First Documentation 
 */
 
 module fix_c_mult #(
@@ -27,10 +34,10 @@ module fix_c_mult #(
    input   [IN_WIDTH - 1 : 0]  opa_I,
    input   [IN_WIDTH - 1 : 0]  opb_R,
    input   [IN_WIDTH - 1 : 0]  opb_I,
-   // only useful if ARITH_MODE == 2
+   // only useful if ARITH_MODE_R/I == 2
    input                       arith_mode_R,
    input                       arith_mode_I,
-   // only useful if COPLEX_MODE == 2
+   // only useful if FLIP == 2
    input                       flip,
    input   [$clog2(2*IN_WIDTH + 1) - 1 : 0] shift_amount,
    output  logic [OUT_WIDTH - 1 : 0]  out_R,
@@ -51,7 +58,9 @@ module fix_c_mult #(
    assign opa_I_sign = opa_I;
    assign opb_R_sign = opb_R;
    assign opb_I_sign = opb_I;
-
+/*
+   SHIFT_MODE here is 0 because shift happens after add
+*/
    fix_mult #(
       .IN_WIDTH(IN_WIDTH),
       .OUT_WIDTH(2*IN_WIDTH),
